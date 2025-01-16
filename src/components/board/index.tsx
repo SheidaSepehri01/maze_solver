@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Cell } from "./components/cell";
 import { astar } from "../../utils/astar";
+import { dijkstra } from "../../utils/dijkstra";
 enum mazeCells {
   start = 2,
   goal = 3,
@@ -14,79 +15,38 @@ export const Board = (props: {
   handleReset: () => void;
   start: boolean;
   handleStart: (val: boolean) => void;
+  algo: string;
 }) => {
   const [maze, setMaze] = useState<number[][]>();
   const [isDrawing, setIsDrawing] = useState<boolean>(false);
 
-  const placeCells = () => {
+  const placeCells = useCallback(() => {
     let cells = Array.from({ length: 20 }, () =>
       Array.from({ length: 25 }, () => 0)
     );
     cells[0][0] = mazeCells.start;
     cells[cells.length - 1][cells[0].length - 1] = mazeCells.goal;
     return cells;
-  };
-  const handleSettingWalls = (row: number, col: number) => {
-    setMaze((prev) => {
-      if (prev) {
-        const nMaze = prev.map((innerRow, rowIndex) =>
-          rowIndex === row
-            ? innerRow.map((cell, colIndex) =>
-                colIndex === col ? (cell === 1 ? 0 : 1) : cell
-              )
-            : innerRow
-        );
-        return nMaze;
-      }
-      return prev;
-    });
-  };
-  // const handleCheckPath = (x: number, y: number) => {
-  //   if (!maze) return;
-  //   const end = { x: maze[0].length - 1, y: maze.length - 1 };
-  //   if (x === end.x && y === end.y) {
-  //     return true;
-  //   } else if (
-  //     x < 0 ||
-  //     y < 0 ||
-  //     x >= maze[0].length ||
-  //     y >= maze.length ||
-  //     maze[y][x] !== 0
-  //   ) {
-  //     return false;
-  //   }
-  //   setMaze((prev) => {
-  //     if (prev) {
-  //       const n = prev.map((innerRow, rowIndex) =>
-  //         rowIndex === y
-  //           ? innerRow.map((cell, colIndex) =>
-  //               colIndex === x ? (cell === 0 ? 4 : cell) : cell
-  //             )
-  //           : innerRow
-  //       );
-  //       return n;
-  //     }
-  //     return prev;
-  //   });
-  //   if (
-  //     handleCheckPath(x + 1, y) || // Right
-  //     handleCheckPath(x, y + 1) || // Down
-  //     handleCheckPath(x - 1, y) || // Left
-  //     handleCheckPath(x, y - 1) // Up
-  //   ) {
-  //     return true;
-  //   }
-  //   setMaze((prev) => {
-  //     const nMaze = prev?.map((innerRow, rowIndex) =>
-  //       rowIndex === y
-  //         ? innerRow.map((cell, colIndex) => (colIndex === x ? 0 : cell))
-  //         : innerRow
-  //     );
-  //     return nMaze ?? prev;
-  //   });
+  }, []);
+  const handleSettingWalls = useCallback(
+    (row: number, col: number) => {
+      setMaze((prev) => {
+        if (prev) {
+          const nMaze = prev.map((innerRow, rowIndex) =>
+            rowIndex === row
+              ? innerRow.map((cell, colIndex) =>
+                  colIndex === col ? (cell === 1 ? 0 : 1) : cell
+                )
+              : innerRow
+          );
+          return nMaze;
+        }
+        return prev;
+      });
+    },
+    [maze]
+  );
 
-  //   return handleCheckPath(x + 1, y);
-  // };
   const handleFindPathAStar = () => {
     if (!maze) return;
     const graph: Record<string, [number, number][]> = {};
@@ -135,7 +95,23 @@ export const Board = (props: {
       alert("no path found");
     }
   };
+  const handleFindPathDijkstra = () => {
+    if (!maze) return;
+    const start: [number, number] = [0, 0];
+    const goal: [number, number] = [maze.length - 1, maze[0].length - 1];
 
+    const path = dijkstra(maze, start, goal);
+    if (path && path.length > 1) {
+      const nMaze = structuredClone(maze);
+
+      path.forEach(([x, y]) => {
+        if (nMaze[y][x] === mazeCells.passage) nMaze[y][x] = mazeCells.visited;
+      });
+      setMaze(nMaze);
+    } else {
+      alert("No path found");
+    }
+  };
   useEffect(() => {
     setMaze(placeCells());
   }, []);
@@ -147,7 +123,12 @@ export const Board = (props: {
   }, [props.reset]);
   useEffect(() => {
     if (props.start) {
-      handleFindPathAStar();
+      if (props.algo === "astar") {
+        handleFindPathAStar();
+      } else {
+        handleFindPathDijkstra();
+      }
+
       props.handleStart(false);
     }
   }, [props.start]);
@@ -166,6 +147,7 @@ export const Board = (props: {
             handleSettingWalls={() => {
               handleSettingWalls(rowindex, celIndex);
             }}
+            algo={props.algo}
           />
         ))
       )}

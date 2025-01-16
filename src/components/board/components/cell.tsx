@@ -6,18 +6,39 @@ export const Cell = (props: {
   draw: boolean;
   num: number;
   handleSettingWalls: () => void;
+  algo: string;
 }) => {
   const { draw, handleSettingWalls, num } = props;
   const isChecked = num === 4;
+  const pathColor = props.algo === "astar" ? "green" : "blue";
   return (
     <div
-      className={clsx(num === 1 && "cel_active", "cel", num === 4 && "path")}
+      className={clsx(num === 1 && "cel_active", "cel")}
       onMouseEnter={() => {
         if (draw) handleSettingWalls();
       }}
+      style={{
+        backgroundColor: num === 4 ? pathColor : undefined,
+      }}
     >
-      {num === 2 && <img src={START} />}
-      {num === 3 && <img src={GOAL} />}
+      {num === 2 && (
+        <img
+          src={START}
+          style={{
+            width: "25px",
+            height: "25px",
+          }}
+        />
+      )}
+      {num === 3 && (
+        <img
+          src={GOAL}
+          style={{
+            width: "25px",
+            height: "25px",
+          }}
+        />
+      )}
       {/* {isChecked && <img src={CHECKED} />} */}
     </div>
   );

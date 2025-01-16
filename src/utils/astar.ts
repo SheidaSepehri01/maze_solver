@@ -1,15 +1,8 @@
-import { PriorityQueue } from "typescript-collections"; // For priority queue functionality
+import { PriorityQueue } from "typescript-collections";
 
 type Node = [number, number];
-type Graph = Record<string, Node[]>; // Adjacency list: key as "x,y" and value as neighbors
+type Graph = Record<string, Node[]>;
 
-/**
- * A* algorithm to find the shortest path in a graph.
- * @param graph - The maze graph represented as an adjacency list.
- * @param startNode - The starting node in the maze.
- * @param goalNode - The goal node to reach.
- * @returns The shortest path as an array of nodes or null if no path exists.
- */
 export function astar(
   graph: Graph,
   startNode: Node,

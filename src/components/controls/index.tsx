@@ -8,22 +8,32 @@ export const Controls = (props: {
   draw: boolean;
   HandleReset: () => void;
   handleStart: (val: boolean) => void;
+  handleSetAlgo: (val: string) => void;
 }) => {
   return (
     <div className="controls_container">
-      <button onClick={() => props.handleStart(true)}>
-        <img src={PLAY} />
-      </button>
-      <button
-        onClick={props.handleDraw}
-        className={clsx(props.draw && "active_button")}
-        title="draw mode"
+      <div className="flex">
+        <button onClick={() => props.handleStart(true)}>
+          <img src={PLAY} />
+        </button>
+        <button
+          onClick={props.handleDraw}
+          className={clsx(props.draw && "active_button")}
+          title="draw mode"
+        >
+          <img src={DRAW} />
+        </button>
+        <button onClick={props.HandleReset} title="reset board">
+          <img src={RESET} />
+        </button>
+      </div>
+      <select
+        className="select"
+        onChange={(e) => props.handleSetAlgo(e.currentTarget.value)}
       >
-        <img src={DRAW} />
-      </button>
-      <button onClick={props.HandleReset} title="reset board">
-        <img src={RESET} />
-      </button>
+        <option selected>astar</option>
+        <option>dijkstra</option>
+      </select>
     </div>
   );
 };

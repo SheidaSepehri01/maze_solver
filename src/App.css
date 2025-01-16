@@ -32,6 +32,10 @@
 .container {
   width: 100vw;
   height: 100vh;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 1;
 }
 .flex_center {
   display: flex;
@@ -48,8 +52,8 @@
 .cel {
   outline: 1px solid gray;
   background-color: bisque;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   margin: 0;
   padding: 0;
 }
@@ -60,22 +64,31 @@
   background-color: black;
   border: 2px solid white;
   display: grid;
-  grid-template-columns: repeat(25, 40px);
-  grid-template-rows: repeat(20, 40px);
+  grid-template-columns: repeat(25, 30px);
+  grid-template-rows: repeat(20, 30px);
   gap: 0;
   justify-content: start;
   align-items: start;
 }
 .controls_container {
-  width: 5em;
-  height: 20em;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
+  width: 20em;
+  height: 8em;
+  display: grid;
+  justify-items: center;
+  align-content: space-between;
   gap: 2;
   background-color: rgb(24, 24, 24);
   border-radius: 40px;
+  padding: 5px;
+  grid-template-columns: 1;
+  grid-template-rows: 2;
+}
+.flex {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2;
   padding: 5px;
 }
 button,
@@ -85,7 +98,19 @@ button:focus {
   outline: none;
   border: none;
 }
-
+.select {
+  width: 90%;
+  border-radius: 20px;
+  height: 40px;
+  color: aliceblue;
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: 2px;
+}
+.select option {
+  color: aliceblue;
+  letter-spacing: 2px;
+}
 .active_button {
   background-color: rgba(86, 86, 86, 0.838);
   outline: none;
@@ -96,7 +121,4 @@ button:focus {
   margin: 0;
   text-align: left;
   height: 2em;
-}
-.path {
-  background-color: green;
 }
