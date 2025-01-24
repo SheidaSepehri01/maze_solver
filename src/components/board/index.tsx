@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Cell } from "./components/cell";
-import { astar } from "../../utils/astar";
+import { Astar, astar } from "../../utils/astar";
 import { dijkstra } from "../../utils/dijkstra";
 enum mazeCells {
   start = 2,
@@ -53,41 +53,13 @@ export const Board = (props: {
     const rows = maze.length;
     const cols = maze[0].length;
     const start: [number, number] = [0, 0];
-    const goal: [number, number] = [cols - 1, rows - 1];
+    const goal: [number, number] = [rows - 1, cols - 1];
 
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        if (maze[y][x] !== mazeCells.wall) {
-          const key = `${x},${y}`;
-          graph[key] = [];
-          //neighbors
-          const directions = [
-            [0, 1],
-            [1, 0],
-            [0, -1],
-            [-1, 0],
-          ];
-          for (const [dx, dy] of directions) {
-            const nx = x + dx;
-            const ny = y + dy;
-            if (
-              nx >= 0 &&
-              nx < cols &&
-              ny >= 0 &&
-              ny < rows &&
-              maze[ny][nx] !== 1
-            ) {
-              graph[key].push([nx, ny]);
-            }
-          }
-        }
-      }
-    }
-    // Run A* algorithm
-    const path = astar(graph, start, goal);
-    if (path) {
+    const result = Astar(maze, start, goal);
+    if (result) {
+      const { path, visited } = result;
       const nMaze = structuredClone(maze);
-      path.forEach(([x, y]) => {
+      path.forEach(([y, x]) => {
         if (nMaze[y][x] === 0) nMaze[y][x] = 4;
       });
       setMaze(nMaze);
