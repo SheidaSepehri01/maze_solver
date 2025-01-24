@@ -1,6 +1,6 @@
-import { PriorityQueue } from "typescript-collections";
 import { Node } from "./utilTypes";
 import { getNeighbors } from "./getNeighbors";
+import { PriorityQueue } from "./priorityQueue";
 
 type Graph = Record<string, Node[]>;
 
@@ -10,7 +10,7 @@ export function astar(
   goalNode: Node
 ): Node[] | null {
   const openSet = new PriorityQueue<{ cost: number; node: Node }>(
-    (a, b) => b.cost - a.cost
+    (a, b) => a.cost - b.cost
   );
   openSet.enqueue({ cost: 0, node: startNode });
 
@@ -63,17 +63,16 @@ export function astar(
 }
 export function Astar(graph: number[][], startNode: Node, goalNode: Node) {
   const openSet: PriorityQueue<{
-    cost: number;
+    gcost: number;
+    fcost: number;
     node: Node;
-  }> = new PriorityQueue<{ cost: number; node: Node }>(
-    (a, b) => b.cost - a.cost
-  );
+  }> = new PriorityQueue((a, b) => a.fcost - b.fcost);
   const costMap: Record<string, number> = {};
   costMap[`${startNode[0]},${startNode[1]}`] = 0;
   const closedSet = new Map();
-  openSet.enqueue({ cost: 0, node: startNode });
+  openSet.enqueue({ fcost: 0, gcost: 0, node: startNode });
   const cameFrom: Record<string, Node | undefined> = {};
-
+  const goalNodeKey = `${goalNode[0]},${goalNode[1]}`;
   const heuristic = (node: Node, goal: Node): number =>
     Math.abs(goal[0] - node[0]) + Math.abs(goal[1] - node[1]);
   const numRows: number = graph.length;
@@ -81,32 +80,31 @@ export function Astar(graph: number[][], startNode: Node, goalNode: Node) {
 
   while (!openSet.isEmpty()) {
     const current = openSet.dequeue()!;
-    const [currentCost, currentNode] = [current.cost, current.node];
-
+    console.log(1);
+    const [currentgCost, currentNode] = [current.gcost, current.node];
     const currentKey = `${currentNode[0]},${currentNode[1]}`;
-    if (currentKey === `${goalNode[0]},${goalNode[1]}`)
+    if (currentKey === goalNodeKey)
       return { path: rebuildPath(cameFrom, currentNode), visited: closedSet };
     if (closedSet.has(currentKey)) continue;
     closedSet.set(currentKey, current);
 
     const neighbors = getNeighbors(currentNode, numRows, numCols);
-
-    if (currentNode[1] === goalNode[1] && currentNode[0] === goalNode[0]) {
-      return { path: rebuildPath(cameFrom, currentNode), visited: closedSet };
-    }
     for (const neighbor of neighbors) {
       const [row, col] = neighbor;
       const neighborKey = `${row},${col}`;
       if (graph[row][col] === 1) continue;
-      if (neighbor === goalNode)
-        return { path: rebuildPath(cameFrom, currentNode), visited: closedSet };
+      if (goalNodeKey === neighborKey) {
+        cameFrom[neighborKey] = currentNode;
+        return { path: rebuildPath(cameFrom, neighbor), visited: closedSet };
+      }
       if (closedSet.has(neighborKey)) continue;
 
-      const newCost = currentCost + 1;
-      if (!(neighborKey in costMap) || newCost < costMap[neighborKey]) {
+      const newCost = currentgCost + 1;
+      if (!costMap[neighborKey] || newCost < costMap[neighborKey]) {
         costMap[neighborKey] = newCost;
         const priority = newCost + heuristic(neighbor, goalNode);
-        openSet.enqueue({ cost: priority, node: neighbor });
+
+        openSet.enqueue({ gcost: newCost, fcost: priority, node: neighbor });
         cameFrom[neighborKey] = currentNode;
       }
     }
