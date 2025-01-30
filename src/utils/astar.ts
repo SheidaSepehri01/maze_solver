@@ -97,9 +97,10 @@ export function Astar(graph: number[][], startNode: Node, goalNode: Node) {
         cameFrom[neighborKey] = currentNode;
         return { path: rebuildPath(cameFrom, neighbor), visited: closedSet };
       }
-      if (closedSet.has(neighborKey)) continue;
 
       const newCost = currentgCost + 1;
+      if (closedSet.has(neighborKey) && costMap[neighborKey] <= newCost)
+        continue;
       if (!costMap[neighborKey] || newCost < costMap[neighborKey]) {
         costMap[neighborKey] = newCost;
         const priority = newCost + heuristic(neighbor, goalNode);
