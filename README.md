@@ -23,7 +23,8 @@ This project implements the following pathfinding algorithms:
 - Click "Start" to visualize the pathfinding process.  
 
 ## 📌 Future Improvements  
-- Implement more algorithms.  
+- Implement more algorithms.
+- optimize the functions.
 - Improve UI responsiveness and animations.  
 - Add weighted nodes to enhance pathfinding.  
 
